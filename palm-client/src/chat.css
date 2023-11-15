@@ -7,6 +7,8 @@
 .h1-chat {
     padding: 10px;
     margin-bottom: 0;
+    margin: 20px;
+    text-align: center;
 }
 
 .div-chat {
@@ -37,3 +39,14 @@
   flex: 1;
   margin-left: 10px;
 }
+
+.vega-welcome {
+  text-align: center;
+  font-style: italic
+}
+
+.user-message {
+  text-align: right;
+  margin: 30px;
+}
+

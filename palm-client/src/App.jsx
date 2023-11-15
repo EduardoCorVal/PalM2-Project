@@ -8,7 +8,8 @@ marked.use({
 });
 
 function App() {
-  const [serverData, setServerData] = useState([{}]);
+  const [messageHistory, setMessageHistory] = useState([]);
+  // const [serverData, setServerData] = useState([{}]);
   const [userPrompt, setUserPrompt] = useState("");
   const inputRef = useRef(null);
 
@@ -21,7 +22,6 @@ function App() {
   }
 
   function handleSubmit() {
-    setServerData("");
     if (userPrompt !== "") {
       fetch("/api", {
         method: "POST",
@@ -33,25 +33,31 @@ function App() {
         .then((res) => res.json())
         .then((data) => {
           const html = DOMPurify.sanitize(marked(data));
-          setServerData({ ...data, html });
-          inputRef.current.focus();
+          const newMessage = { user: userPrompt, response: html };
+
+          setMessageHistory([...messageHistory, newMessage]);
           setUserPrompt("");
+          inputRef.current.focus();
         });
     }
   }
 
   return (
     <main className="main-container">
-      <h1 className="h1-chat">MyPrompter</h1>
+      <h1 className="h1-chat">VEGA Chatbot</h1>
       <div className="div-chat">
         <div className="max-width-height">
-          {serverData === "" ? (
-            "Loading..."
+          {messageHistory.length === 0 ? (
+            <p className="vega-welcome">
+              Hi, I am VEGA, your personal chatbot. How can I help you?
+            </p>
           ) : (
-            <article
-              style={{ margin: "0" }}
-              dangerouslySetInnerHTML={{ __html: serverData.html }}
-            />
+            messageHistory.map((message, index) => (
+              <div key={index}>
+                <p className="user-message">{message.user}</p>
+                <article dangerouslySetInnerHTML={{ __html: message.response }} />
+              </div>
+            ))
           )}
         </div>
       </div>
@@ -62,10 +68,10 @@ function App() {
           ref={inputRef}
           value={userPrompt}
           className="textarea"
-          placeholder="Type in Prompt..."
+          placeholder="Message VEGA..."
         />
         <button onClick={handleSubmit} className="button">
-          Submit
+          Send
         </button>
       </div>
     </main>
