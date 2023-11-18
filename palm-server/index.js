@@ -1,42 +1,21 @@
-require("dotenv").config();
+const express = require('express'),
+  app = express(),
+  cors = require('cors'),
+  oBodyParser = require('body-parser'),
+  oEnvironment = require('./src/constants/Environment.js');
 
-const express = require("express");
-const app = express();
-const bodyParser = require("body-parser");
-app.use(bodyParser.json());
+// use the modules
+app.use(cors({ origin: '*', methods: ['GET', 'POST', 'DELETE'], allowedHeaders: ['Content-Type', 'authorization'] }));
+app.use(oBodyParser.json());
 
-const { TextServiceClient } = require("@google-ai/generativelanguage").v1beta2;
+// if (oEnvironment.DEBUG) {
+//   const oMorgan = require('morgan');
+//   app.use(oMorgan('dev'));
+// }
 
-const { GoogleAuth } = require("google-auth-library");
+// Se levanta el servidor
+app.listen(oEnvironment.PORT, () => console.log(`Server started, listening port: ${oEnvironment.PORT}`));
 
-const TEXT_BISION_01 = "models/text-bison-001";
-const API_KEY = process.env.API_KEY;
-
-const client = new TextServiceClient({
-  authClient: new GoogleAuth().fromAPIKey(API_KEY),
-});
-
-let answer = null;
-let prompt = "Repeat after me: one, two,";
-
-app.post("/api", (req, res) => {
-  prompt = req.body.prompt;
-  client
-    .generateText({
-      model: TEXT_BISION_01,
-      prompt: {
-        text: prompt,
-      },
-    })
-    .then((result) => {
-      answer = result[0].candidates[0].output;
-      res.json(answer);
-      console.log(JSON.stringify(result, null, 2));
-    })
-    .catch((err) => {
-      console.error(err.details);
-      res.json(err.details);
-    });
-});
-
-app.listen(3333, () => console.log("Listening on port 3333"));
+// Se inicializan las rutas
+const oRoutes = require('./src/Routes/Routes.js');
+oRoutes(app);

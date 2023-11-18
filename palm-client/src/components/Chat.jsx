@@ -26,7 +26,7 @@ function Chat() {
 
   function handleSubmit() {
     if (userPrompt !== "") {
-      fetch("/api", {
+      fetch("/chatbot/chatting", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -35,7 +35,7 @@ function Chat() {
       })
         .then((res) => res.json())
         .then((data) => {
-          const html = DOMPurify.sanitize(marked(data));
+          const html = DOMPurify.sanitize(marked(data.data));
           const newMessage = { user: userPrompt, response: html };
 
           setMessageHistory([...messageHistory, newMessage]);
